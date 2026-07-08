@@ -1,0 +1,111 @@
+{
+  "_meta": {
+    "last_updated": "2026-07-06",
+    "note": "status: stocked=available | low=use soon, restock | out=do not plan recipes around | unknown=check before cooking",
+    "frozen_note": "frozen=true items need thaw time — factor into recipe planning",
+    "ratna_note": "Ratna does not eat fish — salmon is Neha only. All recipes serve 2 (Ratna + Neha).",
+    "shopper_note": "2026-07-06 Walmart run (Oakville, Rebecca St store) was picked up by Neha — items below tagged shopper: Neha"
+  },
+  "proteins": [
+    {"item": "Boneless chicken thighs (fresh)", "status": "stocked", "frozen": false, "source": "United Supermarket", "note": "bought 2026-07-02 — fresh, use within 1-2 days"},
+    {"item": "Chicken wings (fresh)", "status": "stocked", "frozen": false, "source": "United Supermarket", "note": "bought 2026-07-02 — use within 1-2 days"},
+    {"item": "Sunrise Tofu Extra Firm", "status": "stocked", "frozen": false, "source": "United Supermarket", "note": "bought 2026-07-02 — use within 4-5 days once opened"},
+    {"item": "Allmax Isoflex protein powder", "status": "stocked", "frozen": false, "source": "supplement store", "note": "daily anchor — flag if running low"},
+    {"item": "GV Canned Pinto Beans", "status": "stocked", "frozen": false, "source": "Walmart", "note": "bought 2026-07-06 by Neha — Great Value brand; shelf-stable backup protein/fiber"}
+  ],
+  "dairy": [
+    {"item": "Fairlife 2% milk (1.5L bottle)", "status": "stocked", "source": "Food Basics", "note": "restocked 2026-06-21 — daily shake anchor and general use"},
+    {"item": "Natrel Pure Organic Filtered milk", "status": "stocked", "source": "Food Basics", "note": "bought 2026-06-21 — general use, cooking, coffee"},
+    {"item": "Fairlife 2% milk (additional, x2)", "status": "stocked", "source": "Walmart", "note": "bought 2026-07-06 by Neha — 2 units, tops up shake anchor supply"}
+  ],
+  "produce": [
+    {"item": "Greenhouse tomatoes", "status": "stocked", "source": "United Supermarket", "note": "bought 2026-07-02 — 2.19 lb"},
+    {"item": "Sweet onion", "status": "stocked", "source": "United Supermarket", "note": "bought 2026-07-02 — 0.60 lb"},
+    {"item": "Avocado", "status": "stocked", "source": "Walmart", "note": "bought 2026-07-06 by Neha — 3 units"}
+  ],
+  "grains_dry": [
+    {"item": "Basmati rice (long grain)", "status": "stocked", "note": "staple"},
+    {"item": "Sona Masoori rice", "status": "stocked", "note": "medium grain, good for South Indian dishes and congee-style rice"},
+    {"item": "Jasmine / short grain rice", "status": "out", "note": "Sona Masoori covers most uses; pick up jasmine if bibimbap planned"},
+    {"item": "Quinoa", "status": "stocked", "note": "~2kg bag — rinse before cooking; 15 min cook time; ~8g protein per cup cooked"},
+    {"item": "Konjac noodles", "status": "stocked", "source": "Asian supermarket"},
+    {"item": "Rolled oats", "status": "stocked"},
+    {"item": "Lucky Pearl potato starch", "status": "stocked", "source": "United Supermarket", "note": "bought 2026-07-02 — distinct from corn starch; good for extra-crisp coating/frying, different texture than corn starch velveting"},
+    {"item": "Rice paper (Rose Brand, M size)", "status": "stocked", "frozen": false, "source": "Asian supermarket", "note": "400g pack — for fresh spring rolls / fried rolls; needs quick water dip before rolling"}
+  ],
+  "legumes_pulses": [
+    {"item": "Red lentils (masoor dal)", "status": "stocked"},
+    {"item": "Yellow split peas (chana/moong dal)", "status": "stocked"},
+    {"item": "Black beans", "status": "stocked"},
+    {"item": "Chickpeas (whole)", "status": "stocked"},
+    {"item": "Peanuts", "status": "stocked"},
+    {"item": "Edamame (frozen)", "status": "stocked", "frozen": true, "source": "Asian supermarket", "note": "snack; microwave 3 min"}
+  ],
+  "nuts_seeds": [
+    {"item": "Cashews", "status": "stocked"},
+    {"item": "Pistachios", "status": "stocked"},
+    {"item": "Pumpkin seeds", "status": "stocked"},
+    {"item": "Chia seeds", "status": "stocked"},
+    {"item": "Black sesame seeds", "status": "stocked", "source": "Spice Bazaar", "note": "restocked 2026-06-21 — QC brand 200g"},
+    {"item": "Salt and pepper pumpkin seeds (snack)", "status": "stocked", "frozen": false, "source": "Asian supermarket", "note": "260g bag — roasted shell-on pumpkin seeds, snack not cooking ingredient"}
+  ],
+  "spices_indian": [
+    {"item": "Cumin powder", "status": "stocked"},
+    {"item": "Coriander powder", "status": "stocked"},
+    {"item": "Kashmiri chilli", "status": "stocked"},
+    {"item": "Garam masala", "status": "stocked"},
+    {"item": "Kitchen king", "status": "stocked"},
+    {"item": "Tandoori masala", "status": "stocked"},
+    {"item": "Kasuri methi", "status": "stocked"},
+    {"item": "Cardamom", "status": "stocked"},
+    {"item": "Cinnamon sticks", "status": "stocked"},
+    {"item": "Dried whole red chilies", "status": "stocked"},
+    {"item": "Mustard seeds", "status": "stocked"},
+    {"item": "Bay leaves", "status": "stocked"},
+    {"item": "Black pepper", "status": "stocked"},
+    {"item": "Sea salt", "status": "stocked"},
+    {"item": "Hing (asafoetida)", "status": "stocked", "source": "Spice Bazaar", "note": "bought 2026-06-21 — LG brand 50g"},
+    {"item": "Curry leaves", "status": "stocked", "source": "Spice Bazaar", "note": "bought 2026-06-21 — store in fridge or freeze"},
+    {"item": "Seedless tamarind", "status": "stocked", "frozen": false, "source": "purchased 2026-07-02", "note": "Aman's brand, 400g block — store in an airtight container in a cool, dark, dry place (pantry shelf is fine); no need to refrigerate unopened. Once opened, airtight container keeps it good for months at room temp, or freeze for longer shelf life. Good for souring in dal/sambar, tamarind chutney, or a tangy pulled-back note in curries — less traditional in khichdi (khichdi usually stays mild/ghee-forward), so better saved for a curry or a tamarind rasam/dal."}
+  ],
+  "sauces_asian": [
+    {"item": "Gochujang", "status": "stocked"},
+    {"item": "Miso", "status": "stocked"},
+    {"item": "Soy sauce", "status": "stocked"},
+    {"item": "Fish sauce", "status": "stocked"},
+    {"item": "MSG", "status": "stocked"},
+    {"item": "Corn starch", "status": "stocked"},
+    {"item": "Chicken powder", "status": "stocked"},
+    {"item": "Sesame oil", "status": "stocked"},
+    {"item": "Rice vinegar", "status": "stocked"}
+  ],
+  "oils_fats": [
+    {"item": "Kalamata PDO olive oil", "status": "stocked"},
+    {"item": "Lemon-infused Italian oil (Sorrento)", "status": "stocked"},
+    {"item": "Canola oil", "status": "stocked"},
+    {"item": "Pomegranate molasses", "status": "stocked"}
+  ],
+  "dry_pantry": [
+    {"item": "Garlic powder", "status": "stocked"},
+    {"item": "Italian seasoning", "status": "stocked"},
+    {"item": "Basil (dry)", "status": "stocked"},
+    {"item": "Tomato paste (jar/tube)", "status": "stocked", "frozen": false, "source": "Walmart", "note": "bought 2026-07-06 by Neha — for curries, Italian-style sauces"},
+    {"item": "Alpino paste", "status": "stocked", "frozen": false, "source": "Walmart", "note": "bought 2026-07-06 by Neha — flag: confirm exact product (nut/spread paste) before recipe planning"}
+  ],
+  "snacks": [
+    {"item": "Wasabi peas", "status": "stocked"},
+    {"item": "Roasted seaweed packs", "status": "stocked"},
+    {"item": "Rice crackers", "status": "stocked"},
+    {"item": "Konjac jelly — lychee flavour", "status": "stocked", "source": "United Supermarket", "note": "restocked 2026-06-21; 4 kcal zero sugar"},
+    {"item": "Konjac jelly — mango flavour", "status": "stocked", "source": "United Supermarket", "note": "bought 2026-06-21; 4 kcal zero sugar"},
+    {"item": "KitKat Mix Ups", "status": "stocked", "source": "Food Basics", "note": "bought 2026-06-21"},
+    {"item": "Rocher Dark Hazelnut Chocolate", "status": "stocked", "source": "Food Basics", "note": "bought 2026-06-21"},
+    {"item": "Mango shape ice cream", "status": "stocked", "source": "United Supermarket", "note": "bought 2026-07-02 — treat, not a diet staple"}
+  ],
+  "restock_soon": [
+    "Eggs (check — not on any receipt today)",
+    "Greek yogurt (Fortinos)",
+    "Sourdough bread (Fortinos)",
+    "Jasmine rice (Asian supermarket — optional)"
+  ]
+}

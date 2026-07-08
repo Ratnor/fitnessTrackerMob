@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "scale": "VeSync smart scale (BIA bioelectrical impedance)",
+    "bf_mode": "Athletes",
+    "scale_caveat": "VeSync BIA algorithm is calibrated for European/American body types. bf_pct may be understated or skewed — treat as directional trend only, NOT absolute truth. Use 4-week trend windows for bf_pct analysis. Weight (lb) and muscle_mass_lb are more reliable day-to-day signals. Visceral score is a useful relative marker.",
+    "note": "BIA fluctuates with hydration/food timing; use trend direction not single readings; waist_cm=null until logged",
+    "fields": "d=date; w=weight_lb; bf=body_fat_pct; mm=muscle_mass_lb; ffm=fat_free_mass_lb; skm=skeletal_muscle_pct; vis=visceral_fat; bmr=kcal; waist=waist_cm; hip=hip_cm; reading_time=HH:MM"
+  },
+  "readings": [
+    {"d": "2026-03-25", "w": 165.9, "bf": 11.5, "mm": 139.3, "ffm": 146.8, "skm": 57.0, "vis": 5, "bmr": 1835, "waist": null, "hip": null, "reading_time": "09:19", "note": "down 2.3 lb vs prior"},
+    {"d": "2026-03-26", "w": 165.9, "bf": 11.5, "mm": 139.3, "ffm": 146.8, "skm": 57.0, "vis": 5, "bmr": 1835, "waist": null, "hip": null, "reading_time": "09:07", "note": "stable"},
+    {"d": "2026-03-27", "w": 165.4, "bf": 11.5, "mm": 138.9, "ffm": 146.3, "skm": 57.1, "vis": 5, "bmr": 1832, "waist": null, "hip": null, "reading_time": "07:23", "note": "down 0.5 lb"},
+    {"d": "2026-03-28", "w": 166.2, "bf": 11.5, "mm": 139.6, "ffm": 147.1, "skm": 57.0, "vis": 5, "bmr": 1837, "waist": null, "hip": null, "reading_time": "19:24", "note": "PM reading +0.8 lb; post-workout + evening food"},
+    {"d": "2026-03-30", "w": 168.7, "bf": 11.8, "mm": 141.2, "ffm": 148.8, "skm": 56.9, "vis": 5, "bmr": 1852, "waist": null, "hip": null, "reading_time": "08:42", "note": "up 2.5 lb; likely glycogen/sodium from leg day"},
+    {"d": "2026-04-02", "w": 167.5, "bf": 11.7, "mm": 140.3, "ffm": 147.8, "skm": 56.9, "vis": 5, "bmr": 1844, "waist": null, "hip": null, "reading_time": "08:36", "note": "down 1.2 lb; settling"},
+    {"d": "2026-04-14", "w": 165.1, "bf": 11.5, "mm": 138.7, "ffm": 146.1, "skm": 57.1, "vis": 5, "bmr": 1830, "waist": null, "hip": null, "reading_time": "06:18", "note": "down 2.4 lb; lowest reading in period"},
+    {"d": "2026-04-15", "w": 166.1, "bf": 11.5, "mm": 139.4, "ffm": 147.0, "skm": 57.0, "vis": 5, "bmr": 1836, "waist": null, "hip": null, "reading_time": "05:57", "note": "up 1.0 lb; normal fluctuation"},
+    {"d": "2026-04-16", "w": 167.9, "bf": 11.7, "mm": 140.7, "ffm": 148.2, "skm": 56.9, "vis": 5, "bmr": 1847, "waist": null, "hip": null, "reading_time": "08:38", "note": "up 1.8 lb; post-workout morning"},
+    {"d": "2026-04-17", "w": 167.8, "bf": 11.7, "mm": 140.6, "ffm": 148.2, "skm": 56.9, "vis": 5, "bmr": 1847, "waist": null, "hip": null, "reading_time": "08:53", "note": "stable vs prior day; last reading before vacation"},
+    {"d": "2026-05-06", "w": 171.0, "bf": 12.1, "mm": 142.6, "ffm": 150.3, "skm": 56.7, "vis": 6, "bmr": 1866, "waist": null, "hip": null, "reading_time": "06:24", "note": "post_vacation return; up 3.2 lb vs 04-17; mm highest logged at 142.6 (likely glycogen rebound + real gain); bf minor increase 11.7->12.1 (treat as trend signal only per scale_caveat); visceral still excellent at 6; returning to training today"}
+  ]
+}
