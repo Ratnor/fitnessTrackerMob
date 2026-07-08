@@ -43,15 +43,15 @@ export interface WorkoutSession {
 export interface BodyReading {
   d: string; // YYYY-MM-DD
   w: number; // weight lb
-  bf: number; // body fat % — TREND SIGNAL ONLY (BIA caveat)
-  mm: number; // muscle mass lb
-  ffm: number; // fat-free mass lb
-  skm: number; // skeletal muscle %
-  vis: number; // visceral score
-  bmr: number; // kcal
+  bf?: number | null; // body fat % — TREND SIGNAL ONLY (BIA caveat)
+  mm?: number | null; // muscle mass lb
+  ffm?: number | null; // fat-free mass lb
+  skm?: number | null; // skeletal muscle %
+  vis?: number | null; // visceral score
+  bmr?: number | null; // kcal
   waist: number | null; // cm
   hip: number | null; // cm
-  reading_time: string; // HH:MM
+  reading_time?: string; // HH:MM
   note?: string;
 }
 

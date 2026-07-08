@@ -236,7 +236,35 @@ export default function TodayDashboard() {
             skipped is not.
           </p>
         )}
+        <Link
+          href="/food"
+          className="mt-3 block w-full rounded-xl border border-neutral-700 bg-neutral-800 py-2.5 text-center text-sm font-semibold active:bg-neutral-700"
+        >
+          Log food
+        </Link>
       </section>
+
+      {/* Nav */}
+      <nav className="mt-4 grid grid-cols-3 gap-2">
+        <Link
+          href="/body"
+          className="rounded-xl border border-neutral-800 bg-neutral-900 py-3 text-center text-sm font-semibold active:bg-neutral-800"
+        >
+          Body
+        </Link>
+        <Link
+          href="/import"
+          className="rounded-xl border border-neutral-800 bg-neutral-900 py-3 text-center text-sm font-semibold active:bg-neutral-800"
+        >
+          Import
+        </Link>
+        <Link
+          href="/logger"
+          className="rounded-xl border border-neutral-800 bg-neutral-900 py-3 text-center text-sm font-semibold active:bg-neutral-800"
+        >
+          Log gym
+        </Link>
+      </nav>
 
       <footer className="mt-8 text-center">
         <Link href="/debug" className="text-xs text-neutral-600 underline">
