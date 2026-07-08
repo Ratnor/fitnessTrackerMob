@@ -197,6 +197,15 @@ export default function TodayDashboard() {
               <li key={n}>· {n}</li>
             ))}
           </ul>
+
+          {plan.split && (
+            <Link
+              href="/logger"
+              className="mt-4 block w-full rounded-2xl bg-emerald-600 py-3.5 text-center text-lg font-bold text-white active:bg-emerald-500"
+            >
+              Start session
+            </Link>
+          )}
         </section>
       )}
 
