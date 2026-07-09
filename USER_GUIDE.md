@@ -4,7 +4,11 @@ A local-first fitness tracker PWA. All data lives in IndexedDB **on your phone**
 
 ## Install
 
-Open the Vercel URL in Safari on iPhone → Share → **Add to Home Screen**. The icon opens full-screen like a native app. Updates arrive automatically when you open the app online; after big changes, force-quit and reopen.
+Open the Vercel URL in Safari on iPhone → Share → **Add to Home Screen**. The icon opens full-screen like a native app. Updates arrive automatically when you open the app online; after big changes, force-quit and reopen. If you open the URL in a plain browser tab, a banner reminds you to install.
+
+## Offline
+
+A service worker caches the app shell, so the installed app opens and works with **no connection** — gym wifi dead zones included. All logging (sets, food, body) works offline because data lives on-device; only the Coach share and app updates need a connection.
 
 ## The screens
 
@@ -46,6 +50,15 @@ Before food and water: scale, then tape at navel (relaxed).
 Your VeSync scale, RENPHO tape, and Apple Watch all write into Apple Health. The **Health Export** Shortcut (build it once — see `SHORTCUT_GUIDE.md`) reads Health and puts a JSON on your clipboard.
 
 Run Shortcut → open Import → paste → **Preview** → **Save**. This feeds the Recovery card (HRV/RHR/sleep) and merges weight/waist into Body trends. Do it each morning after the weigh-in.
+
+### Coach (`/coach`) — one-tap Claude handoff
+
+Tap **Ask the coach** on the Today screen. The app assembles your last 7 workout sessions, last 14 body readings, recovery snapshots, last 7 diet days, recent session notes, and pantry status into a single Claude-ready prompt (with your coaching rules and data conventions baked in — no file uploads needed).
+
+- **Ask the coach** opens the iOS Share Sheet → tap Claude → the conversation starts with full context; type your question at the end.
+- **Copy to clipboard** if you'd rather paste into Claude.ai yourself (also the automatic fallback on desktop browsers).
+- The preview shows a token estimate; it warns if the context somehow exceeds the 8k budget.
+- This export is also your de-facto **data backup** — do it at least weekly.
 
 ### Debug (`/debug`)
 

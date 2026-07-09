@@ -3,11 +3,17 @@
 Local-first health tracker PWA per `../health_tracker_dev_plan.docx`.
 Stack: Next.js 14 · TypeScript · Tailwind · IndexedDB (idb) · Vercel.
 
-## Status
+## Status — all 6 phases built
 
-- **Phase 0 — Environment & Pipeline: code done.** Project scaffolded, PWA manifest + icons in place. Remaining: your GitHub/Vercel/iPhone steps below.
-- **Phase 1 — Data Layer: done.** Types, IndexedDB schema (6 stores), repositories, and seed from your real history (32 workout sessions, 11 body readings, 8 diet entries, 5 notes, 74 pantry items). Seeding is idempotent — runs once on first load, skipped after.
-- Phases 2–6 (dashboard, logger, health import, coach export, PWA polish): not started.
+- **Phase 0 — Environment & Pipeline**: done, deployed on Vercel, installed as iPhone PWA.
+- **Phase 1 — Data Layer**: done. 6 IndexedDB stores, repositories, idempotent seed from real history.
+- **Phase 2 — Today Dashboard**: done. Day-type badge (schedule + split-swap aware), recovery status (worst-of-three HRV/RHR/sleep), training targets with ghost numbers, protein bar.
+- **Phase 3 — Session Logger**: done. Write-on-set-completion, ghost numbers, auto rest timer (90/60s), wake lock, warm-ups, undo, split override chips.
+- **Phase 4 — Health Import & Body**: done. Apple Health via iOS Shortcut (SHORTCUT_GUIDE.md), waist_in→cm conversion, 1-decimal rounding, body trends + recomp signal, food log with edit-in-place.
+- **Phase 5 — Coach Export**: done. `/coach` assembles PROMPT.md-shaped context (~4.3k tokens) → Share Sheet → Claude; clipboard fallback.
+- **Phase 6 — PWA Polish**: done. next-pwa service worker (offline app shell), install hint banner, apple-touch icon, haptics on sets/timer.
+
+See USER_GUIDE.md for daily usage; SHORTCUT_GUIDE.md for the Health Export Shortcut.
 
 ## Run locally
 

@@ -58,6 +58,7 @@ export default function TodayDashboard() {
   const [targets, setTargets] = useState<TodayTargets | null>(null);
   const [proteinToday, setProteinToday] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
+  const [showInstallHint, setShowInstallHint] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -99,6 +100,12 @@ export default function TodayDashboard() {
         setError(e instanceof Error ? e.message : String(e));
       }
     })();
+
+    // Install hint: only when running in a plain browser tab (not installed)
+    setShowInstallHint(
+      typeof window !== "undefined" &&
+        !window.matchMedia("(display-mode: standalone)").matches
+    );
   }, []);
 
   const dateLabel = new Date().toLocaleDateString("en-CA", {
@@ -128,6 +135,13 @@ export default function TodayDashboard() {
       {error && (
         <div className="mt-6 rounded-lg border border-red-800 bg-red-950 p-4 text-sm text-red-300">
           {error}
+        </div>
+      )}
+
+      {showInstallHint && (
+        <div className="mt-4 rounded-lg border border-sky-800 bg-sky-950 p-3 text-sm text-sky-300">
+          Running in the browser — for the full app (offline, full-screen):
+          Share → Add to Home Screen.
         </div>
       )}
 
@@ -263,7 +277,13 @@ export default function TodayDashboard() {
       </section>
 
       {/* Nav */}
-      <nav className="mt-4 grid grid-cols-3 gap-2">
+      <nav className="mt-4 grid grid-cols-2 gap-2">
+        <Link
+          href="/coach"
+          className="rounded-xl border border-emerald-900 bg-emerald-950 py-3 text-center text-sm font-bold text-emerald-300 active:bg-emerald-900"
+        >
+          Ask the coach
+        </Link>
         <Link
           href="/body"
           className="rounded-xl border border-neutral-800 bg-neutral-900 py-3 text-center text-sm font-semibold active:bg-neutral-800"
