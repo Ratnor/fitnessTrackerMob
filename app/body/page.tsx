@@ -48,10 +48,11 @@ function Sparkline({
       </svg>
       <div className="flex justify-between text-[10px] text-neutral-600">
         <span>
-          {points[0].d} · {points[0].v}
+          {points[0].d} · {points[0].v.toFixed(1)}
         </span>
         <span>
-          {points[points.length - 1].d} · {points[points.length - 1].v}
+          {points[points.length - 1].d} ·{" "}
+          {points[points.length - 1].v.toFixed(1)}
         </span>
       </div>
     </div>
@@ -201,9 +202,9 @@ export default function Body() {
 
       {latest && (
         <p className="mt-4 text-center text-xs text-neutral-500">
-          Latest: {latest.w} lb on {latest.d}
-          {latest.waist != null && ` · waist ${latest.waist} cm`}
-          {latest.bf != null && ` · BF ${latest.bf}% (trend only)`}
+          Latest: {latest.w.toFixed(1)} lb on {latest.d}
+          {latest.waist != null && ` · waist ${latest.waist.toFixed(1)} cm`}
+          {latest.bf != null && ` · BF ${latest.bf.toFixed(1)}% (trend only)`}
         </p>
       )}
     </main>

@@ -10,6 +10,13 @@ import type { HealthSnapshot } from "@/src/types";
 const healthRepo = new HealthRepository();
 const bodyService = new BodyService(new BodyRepository());
 
+const round1 = (n: number) => Math.round(n * 10) / 10;
+
+/** A human waist below 50 cm is almost certainly inches — the classic Shortcut unit slip. */
+function waistLooksLikeInches(waistCm: number | undefined | null): boolean {
+  return waistCm != null && waistCm < 50;
+}
+
 /** Shortcut export format — dev plan §1.4 */
 interface ShortcutExport {
   date?: string;
@@ -85,10 +92,10 @@ export default function Import() {
     if (b && (b.weight_lb != null || b.waist_cm != null)) {
       await bodyService.upsertReading({
         d: parsed.date,
-        ...(b.weight_lb != null ? { w: b.weight_lb } : {}),
-        ...(b.body_fat_pct != null ? { bf: b.body_fat_pct } : {}),
-        ...(b.muscle_mass_lb != null ? { mm: b.muscle_mass_lb } : {}),
-        ...(b.waist_cm != null ? { waist: b.waist_cm } : {}),
+        ...(b.weight_lb != null ? { w: round1(b.weight_lb) } : {}),
+        ...(b.body_fat_pct != null ? { bf: round1(b.body_fat_pct) } : {}),
+        ...(b.muscle_mass_lb != null ? { mm: round1(b.muscle_mass_lb) } : {}),
+        ...(b.waist_cm != null ? { waist: round1(b.waist_cm) } : {}),
         note: "imported via Apple Health Shortcut",
       });
       bodyMsg = " + body reading";
@@ -156,10 +163,19 @@ export default function Import() {
               <li>Sleep {parsed.recovery.sleep_hours} h</li>
             )}
             {parsed.body?.weight_lb != null && (
-              <li>Weight {parsed.body.weight_lb} lb</li>
+              <li>Weight {round1(parsed.body.weight_lb)} lb</li>
             )}
             {parsed.body?.waist_cm != null && (
-              <li>Waist {parsed.body.waist_cm} cm</li>
+              <li>
+                Waist {round1(parsed.body.waist_cm)} cm
+                {waistLooksLikeInches(parsed.body.waist_cm) && (
+                  <span className="text-amber-400">
+                    {" "}
+                    — this looks like inches! Set Unit to cm in the
+                    Shortcut&apos;s Waist action, re-run, re-import.
+                  </span>
+                )}
+              </li>
             )}
             {parsed.body?.body_fat_pct != null && (
               <li>BF {parsed.body.body_fat_pct}% (trend only)</li>
