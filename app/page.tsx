@@ -25,7 +25,8 @@ const PROTEIN_TARGET = 130;
 const PROTEIN_IDEAL = 160;
 
 const scheduleService = new ScheduleService();
-const workoutService = new WorkoutService(new WorkoutRepository());
+const workoutRepo = new WorkoutRepository();
+const workoutService = new WorkoutService(workoutRepo);
 const healthService = new HealthService(new HealthRepository());
 const dietRepo = new DietRepository();
 
@@ -64,7 +65,23 @@ export default function TodayDashboard() {
         await seedIfEmpty();
 
         const today = new Date();
-        const dayPlan = scheduleService.getDayPlan(today);
+        let dayPlan = scheduleService.getDayPlan(today);
+
+        // If a session was already logged today with a different split
+        // (e.g. missed Tuesday push → push on Thursday), follow reality.
+        const todaySession = await workoutRepo.getById(localDateString(today));
+        if (
+          todaySession &&
+          todaySession.split !== dayPlan.split &&
+          ["push", "pull", "legs"].includes(todaySession.split)
+        ) {
+          dayPlan = {
+            ...dayPlan,
+            dayType: todaySession.split.toUpperCase() as DayPlan["dayType"],
+            split: todaySession.split as "push" | "pull" | "legs",
+            headline: `Gym — ${todaySession.split} (swapped from ${dayPlan.dayType})`,
+          };
+        }
         setPlan(dayPlan);
 
         setRecovery(await healthService.getRecoveryStatus());

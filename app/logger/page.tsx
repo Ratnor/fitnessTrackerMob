@@ -110,6 +110,15 @@ export default function Logger() {
     };
   }, []);
 
+  // --- split override (missed a day? train any split today) ---
+  async function changeSplit(split: string) {
+    if (!session || session.split === split) return;
+    const updated = await logService.setSplit(session, split);
+    setSession({ ...updated });
+    const t = await workoutService.getTodayTargets(split);
+    setSuggested(t.exercises.map((e) => e.name));
+  }
+
   // --- exercise selection ---
   async function openExercise(name: string) {
     const ghost = await workoutRepo.getLastSetForExercise(name);
@@ -194,6 +203,25 @@ export default function Logger() {
           </span>
           <span className="text-xs text-sky-400">tap to skip</span>
         </button>
+      )}
+
+      {/* Split override chips */}
+      {!active && session && (
+        <div className="mt-4 flex gap-2">
+          {["push", "pull", "legs"].map((s) => (
+            <button
+              key={s}
+              onClick={() => changeSplit(s)}
+              className={`flex-1 rounded-full border px-3 py-2 text-sm font-semibold capitalize ${
+                session.split === s
+                  ? "border-emerald-600 bg-emerald-950 text-emerald-300"
+                  : "border-neutral-800 bg-neutral-900 text-neutral-400"
+              }`}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
       )}
 
       {/* Exercise list */}

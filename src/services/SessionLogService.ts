@@ -107,6 +107,16 @@ export class SessionLogService {
     return session;
   }
 
+  /** Change today's split (e.g. missed Tuesday push → push on Thursday). Persists immediately. */
+  async setSplit(
+    session: WorkoutSession,
+    split: string
+  ): Promise<WorkoutSession> {
+    session.split = split;
+    await this.workouts.save(session);
+    return session;
+  }
+
   /** Attach a session note (e.g. at finish). Persists immediately. */
   async setNote(
     session: WorkoutSession,
