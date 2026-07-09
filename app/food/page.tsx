@@ -44,6 +44,12 @@ export default function Food() {
   const [protein, setProtein] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  // inline meal editing
+  const [editIdx, setEditIdx] = useState<number | null>(null);
+  const [editLabel, setEditLabel] = useState("breakfast");
+  const [editFoods, setEditFoods] = useState("");
+  const [editProtein, setEditProtein] = useState("");
+
   const today = localDateString();
 
   useEffect(() => {
@@ -76,10 +82,31 @@ export default function Food() {
 
   async function removeMeal(index: number) {
     if (!entry) return;
+    setEditIdx(null);
     await persist({
       ...entry,
       meals: entry.meals.filter((_, i) => i !== index),
     });
+  }
+
+  function startEdit(index: number) {
+    if (!entry) return;
+    const m = entry.meals[index];
+    setEditIdx(index);
+    setEditLabel(m.t);
+    setEditFoods(m.f);
+    setEditProtein(String(m.p));
+  }
+
+  async function saveEdit() {
+    if (!entry || editIdx === null) return;
+    const p = parseInt(editProtein, 10);
+    if (!editFoods.trim() || isNaN(p) || p < 0) return;
+    const meals = entry.meals.map((m, i) =>
+      i === editIdx ? { t: editLabel, f: editFoods.trim(), p } : m
+    );
+    setEditIdx(null);
+    await persist({ ...entry, meals });
   }
 
   async function addCustom() {
@@ -187,28 +214,76 @@ export default function Food() {
       {/* Today's meals */}
       {entry && entry.meals.length > 0 && (
         <section className="mt-5 space-y-2">
-          {entry.meals.map((m, i) => (
-            <div
-              key={i}
-              className="flex items-start justify-between gap-3 rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3"
-            >
-              <div className="min-w-0">
-                <p className="text-xs uppercase tracking-wide text-neutral-500">
-                  {m.t}
-                </p>
-                <p className="mt-0.5 text-sm">{m.f}</p>
+          {entry.meals.map((m, i) =>
+            editIdx === i ? (
+              <div
+                key={i}
+                className="rounded-xl border border-sky-800 bg-neutral-900 px-4 py-3"
+              >
+                <div className="flex gap-2">
+                  <select
+                    value={editLabel}
+                    onChange={(e) => setEditLabel(e.target.value)}
+                    className="rounded-lg border border-neutral-800 bg-neutral-950 px-2 py-2 text-sm"
+                  >
+                    {MEAL_LABELS.map((l) => (
+                      <option key={l}>{l}</option>
+                    ))}
+                  </select>
+                  <input
+                    inputMode="numeric"
+                    value={editProtein}
+                    onChange={(e) => setEditProtein(e.target.value)}
+                    placeholder="g protein"
+                    className="w-24 rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm"
+                  />
+                </div>
+                <textarea
+                  value={editFoods}
+                  onChange={(e) => setEditFoods(e.target.value)}
+                  rows={2}
+                  className="mt-2 w-full rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm"
+                />
+                <div className="mt-2 flex gap-2">
+                  <button
+                    onClick={saveEdit}
+                    className="flex-1 rounded-lg bg-emerald-600 py-2 text-sm font-bold text-white"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => setEditIdx(null)}
+                    className="flex-1 rounded-lg border border-neutral-700 py-2 text-sm"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => removeMeal(i)}
+                    className="rounded-lg border border-red-900 px-3 py-2 text-sm text-red-400"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-              <div className="flex shrink-0 items-center gap-2">
-                <span className="font-bold">{m.p}g</span>
-                <button
-                  onClick={() => removeMeal(i)}
-                  className="text-xs text-neutral-500 underline"
-                >
-                  remove
-                </button>
-              </div>
-            </div>
-          ))}
+            ) : (
+              <button
+                key={i}
+                onClick={() => startEdit(i)}
+                className="flex w-full items-start justify-between gap-3 rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-left active:bg-neutral-800"
+              >
+                <div className="min-w-0">
+                  <p className="text-xs uppercase tracking-wide text-neutral-500">
+                    {m.t}
+                  </p>
+                  <p className="mt-0.5 text-sm">{m.f}</p>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="font-bold">{m.p}g</span>
+                  <span className="text-xs text-neutral-500">edit</span>
+                </div>
+              </button>
+            )
+          )}
         </section>
       )}
     </main>
