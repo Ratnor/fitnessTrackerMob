@@ -33,25 +33,24 @@ export function restSecondsFor(exercise: string): number {
 export class SessionLogService {
   constructor(private readonly workouts: IWorkoutRepository) {}
 
-  /** Resume today's session if it exists, else create + persist a new one. */
+  /**
+   * Resume today's session if it has real data; otherwise return an
+   * UNSAVED draft. Nothing is persisted until the first set is logged —
+   * merely opening the logger must not create a session (it would hijack
+   * the dashboard's day type on BJJ/rest days).
+   */
   async getOrCreateToday(
     split: string,
     time: string = new Date().getHours() < 12 ? "AM" : "PM"
   ): Promise<WorkoutSession> {
     const id = localDateString();
     const existing = await this.workouts.getById(id);
-    if (existing) return existing;
-
-    const session: WorkoutSession = {
-      id,
-      d: id,
-      time,
-      split,
-      cardio: null,
-      ex: [],
-    };
-    await this.workouts.save(session);
-    return session;
+    if (existing) {
+      if (existing.ex.length > 0) return existing;
+      // phantom from an earlier logger visit — clean it up
+      await this.workouts.delete(id);
+    }
+    return { id, d: id, time, split, cardio: null, ex: [] };
   }
 
   /** Append a working set; creates the exercise entry on first set. Persists immediately. */
@@ -107,13 +106,14 @@ export class SessionLogService {
     return session;
   }
 
-  /** Change today's split (e.g. missed Tuesday push → push on Thursday). Persists immediately. */
+  /** Change today's split (e.g. missed Tuesday push → push on Thursday).
+   *  Only persists if the session already has logged sets — drafts stay drafts. */
   async setSplit(
     session: WorkoutSession,
     split: string
   ): Promise<WorkoutSession> {
     session.split = split;
-    await this.workouts.save(session);
+    if (session.ex.length > 0) await this.workouts.save(session);
     return session;
   }
 

@@ -72,6 +72,7 @@ export default function TodayDashboard() {
         const todaySession = await workoutRepo.getById(localDateString(today));
         if (
           todaySession &&
+          todaySession.ex.length > 0 && // only real sessions with logged sets
           todaySession.split !== dayPlan.split &&
           ["push", "pull", "legs"].includes(todaySession.split)
         ) {

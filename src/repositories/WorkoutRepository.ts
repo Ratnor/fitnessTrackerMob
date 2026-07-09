@@ -6,6 +6,7 @@ export interface IWorkoutRepository {
   getAll(): Promise<WorkoutSession[]>;
   getById(id: string): Promise<WorkoutSession | undefined>;
   getLastSetForExercise(name: string): Promise<LastSet | null>;
+  delete(id: string): Promise<void>;
   count(): Promise<number>;
 }
 
@@ -43,6 +44,11 @@ export class WorkoutRepository implements IWorkoutRepository {
       }
     }
     return null;
+  }
+
+  async delete(id: string): Promise<void> {
+    const db = await openDatabase();
+    await db.delete("workouts", id);
   }
 
   async count(): Promise<number> {
