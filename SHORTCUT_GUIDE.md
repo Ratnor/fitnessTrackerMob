@@ -21,13 +21,18 @@ Every field is optional except `date` — the Import screen handles missing valu
 ## Version 1 — body metrics only (build this first, ~10 min)
 
 1. Open **Shortcuts** → **+** → rename to **Health Export**.
-2. Add action: **Find Health Samples** (search "health samples").
-   - Type: **Weight** · Sort by: Start Date · Order: Latest First · Limit: 1
-   - Rename this action's result for clarity (tap ⓘ → Rename → "Weight").
-3. Repeat step 2 three more times for: **Body Fat Percentage**, **Lean Body Mass**, **Waist Circumference**.
-   - Note: VeSync writes muscle mass as Lean Body Mass; units — check your Health app shows lb and cm (set per-type units in Health → Browse → the metric → Unit).
+2. Add action: **Find Health Samples** (search "health samples"). Configure:
+   - Type: **Weight**
+   - **No date filter** — if a "Start Date" filter appears, remove it. "Where **All** of the following are true" is just the filter-group header; with no filters it does nothing — leave it.
+   - Unit: **lbs** · Group by: None · Sort by: **Start Date** · Order: **Latest First** · Limit: **Get 1 Health sample**
+   - Latest First + Limit 1 = most recent reading, whenever it was taken. A date filter would return nothing on days without a fresh sample (waist is weekly!).
+3. Add **three more separate Find Health Samples actions** (one per metric — do NOT use "Filter Health Samples" or add metrics as filters):
+   - **Body Fat Percentage** (%)
+   - **Lean Body Mass** — ⚠ set Unit to **lb** (Health often defaults to kg; the tracker stores lb)
+   - **Waist Circumference** (cm)
+   All: Latest First, Limit 1, no date filter.
 4. Add action: **Format Date** with Current Date, format `yyyy-MM-dd` (custom format).
-5. Add action: **Text**, and type the JSON, inserting magic variables where values go:
+5. Add action: **Text**, and type the JSON, inserting magic variables where values go. You'll see several identical "Health Samples" variables — they appear in the same order as your Find actions (Weight, BF%, Lean Mass, Waist). Optional: tap an inserted variable bubble → **Rename** to label it.
 
    ```
    {
@@ -75,3 +80,6 @@ Step on scale → tape waist (RENPHO) → tap **Health Export** → tracker open
 - **Empty value in JSON** → that Health type has no recent sample or permission was denied (Shortcuts → shortcut → ⓘ → Privacy).
 - **Import says invalid JSON** → check for a trailing comma after the last field in a block; the Text action must produce strict JSON.
 - **Waist not in Health** → confirm the RENPHO app has Health write permission for Waist Circumference.
+- **Lean Body Mass comes out in kg** → set Unit to lb inside that Find Health Samples action (the tracker stores lb).
+- **Added a "Filter Health Samples" action by mistake** → delete it; each metric needs its own Find Health Samples action instead.
+- **BMI** → don't bother exporting it; the tracker derives everything it needs from weight + waist.
