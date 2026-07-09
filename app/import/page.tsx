@@ -12,6 +12,16 @@ const bodyService = new BodyService(new BodyRepository());
 
 const round1 = (n: number) => Math.round(n * 10) / 10;
 
+/** Prefer explicit cm; fall back to inches → cm. */
+function waistCmFrom(b?: {
+  waist_cm?: number;
+  waist_in?: number;
+}): number | undefined {
+  if (b?.waist_cm != null) return b.waist_cm;
+  if (b?.waist_in != null) return b.waist_in * 2.54;
+  return undefined;
+}
+
 /** A human waist below 50 cm is almost certainly inches — the classic Shortcut unit slip. */
 function waistLooksLikeInches(waistCm: number | undefined | null): boolean {
   return waistCm != null && waistCm < 50;
@@ -34,6 +44,8 @@ interface ShortcutExport {
     body_fat_pct?: number;
     muscle_mass_lb?: number;
     waist_cm?: number;
+    /** Shortcuts' Unit picker has no cm — export inches and we convert. */
+    waist_in?: number;
   };
   activity_yesterday?: {
     active_kcal?: number;
@@ -89,13 +101,14 @@ export default function Import() {
 
     let bodyMsg = "";
     const b = parsed.body;
-    if (b && (b.weight_lb != null || b.waist_cm != null)) {
+    const waistCm = waistCmFrom(b);
+    if (b && (b.weight_lb != null || waistCm != null)) {
       await bodyService.upsertReading({
         d: parsed.date,
         ...(b.weight_lb != null ? { w: round1(b.weight_lb) } : {}),
         ...(b.body_fat_pct != null ? { bf: round1(b.body_fat_pct) } : {}),
         ...(b.muscle_mass_lb != null ? { mm: round1(b.muscle_mass_lb) } : {}),
-        ...(b.waist_cm != null ? { waist: round1(b.waist_cm) } : {}),
+        ...(waistCm != null ? { waist: round1(waistCm) } : {}),
         note: "imported via Apple Health Shortcut",
       });
       bodyMsg = " + body reading";
@@ -165,14 +178,20 @@ export default function Import() {
             {parsed.body?.weight_lb != null && (
               <li>Weight {round1(parsed.body.weight_lb)} lb</li>
             )}
-            {parsed.body?.waist_cm != null && (
+            {waistCmFrom(parsed.body) != null && (
               <li>
-                Waist {round1(parsed.body.waist_cm)} cm
-                {waistLooksLikeInches(parsed.body.waist_cm) && (
+                Waist {round1(waistCmFrom(parsed.body)!)} cm
+                {parsed.body?.waist_in != null && (
+                  <span className="text-neutral-500">
+                    {" "}
+                    (from {round1(parsed.body.waist_in)} in)
+                  </span>
+                )}
+                {waistLooksLikeInches(parsed.body?.waist_cm) && (
                   <span className="text-amber-400">
                     {" "}
-                    — this looks like inches! Set Unit to cm in the
-                    Shortcut&apos;s Waist action, re-run, re-import.
+                    — this looks like inches! Use the &quot;waist_in&quot; key
+                    in the Shortcut instead, re-run, re-import.
                   </span>
                 )}
               </li>

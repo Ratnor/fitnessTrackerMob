@@ -29,8 +29,8 @@ Every field is optional except `date` — the Import screen handles missing valu
 3. Add **three more separate Find Health Samples actions** (one per metric — do NOT use "Filter Health Samples" or add metrics as filters):
    - **Body Fat Percentage** (%)
    - **Lean Body Mass** — ⚠ set Unit to **lb** (Health often defaults to kg; the tracker stores lb)
-   - **Waist Circumference** (cm)
-   All: Latest First, Limit 1, no date filter.
+   - **Waist Circumference** — Shortcuts' Unit picker has no cm, so use **in** and name the JSON key `waist_in`; the tracker converts to cm on import.
+   All: Latest First, Limit 1, no date filter (or "in the last 30 days").
 4. Add action: **Format Date** with Current Date, format `yyyy-MM-dd` (custom format).
 5. Add action: **Text**, and type the JSON, inserting magic variables where values go. You'll see several identical "Health Samples" variables — they appear in the same order as your Find actions (Weight, BF%, Lean Mass, Waist). Optional: tap an inserted variable bubble → **Rename** to label it.
 
@@ -41,7 +41,7 @@ Every field is optional except `date` — the Import screen handles missing valu
        "weight_lb": [Weight],
        "body_fat_pct": [Body Fat Percentage],
        "muscle_mass_lb": [Lean Body Mass],
-       "waist_cm": [Waist Circumference]
+       "waist_in": [Waist Circumference]
      }
    }
    ```
