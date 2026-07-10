@@ -46,11 +46,21 @@ export class SessionLogService {
     const id = localDateString();
     const existing = await this.workouts.getById(id);
     if (existing) {
-      if (existing.ex.length > 0) return existing;
+      if (existing.ex.length > 0 || existing.cardio) return existing;
       // phantom from an earlier logger visit — clean it up
       await this.workouts.delete(id);
     }
     return { id, d: id, time, split, cardio: null, ex: [] };
+  }
+
+  /** Record warm-up cardio (e.g. treadmill before lifting). Persists immediately. */
+  async setCardio(
+    session: WorkoutSession,
+    cardio: { type: string; km: number; min: number }
+  ): Promise<WorkoutSession> {
+    session.cardio = cardio;
+    await this.workouts.save(session);
+    return session;
   }
 
   /** Append a working set; creates the exercise entry on first set. Persists immediately. */

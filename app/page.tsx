@@ -59,6 +59,7 @@ export default function TodayDashboard() {
   const [proteinToday, setProteinToday] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [showInstallHint, setShowInstallHint] = useState(false);
+  const [sessionLoggedToday, setSessionLoggedToday] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -71,9 +72,11 @@ export default function TodayDashboard() {
         // If a session was already logged today with a different split
         // (e.g. missed Tuesday push → push on Thursday), follow reality.
         const todaySession = await workoutRepo.getById(localDateString(today));
+        const hasRealSession = !!todaySession && todaySession.ex.length > 0;
+        setSessionLoggedToday(hasRealSession);
         if (
           todaySession &&
-          todaySession.ex.length > 0 && // only real sessions with logged sets
+          hasRealSession &&
           todaySession.split !== dayPlan.split &&
           ["push", "pull", "legs"].includes(todaySession.split)
         ) {
@@ -82,6 +85,10 @@ export default function TodayDashboard() {
             dayType: todaySession.split.toUpperCase() as DayPlan["dayType"],
             split: todaySession.split as "push" | "pull" | "legs",
             headline: `Gym — ${todaySession.split} (swapped from ${dayPlan.dayType})`,
+            // the scheduled day's notes don't apply to a swapped session
+            notes: [
+              `Swapped: ${dayPlan.dayType} moves to another day this week`,
+            ],
           };
         }
         setPlan(dayPlan);
@@ -233,9 +240,15 @@ export default function TodayDashboard() {
           {plan.split && (
             <Link
               href="/logger"
-              className="mt-4 block w-full rounded-2xl bg-emerald-600 py-3.5 text-center text-lg font-bold text-white active:bg-emerald-500"
+              className={`mt-4 block w-full rounded-2xl py-3.5 text-center text-lg font-bold ${
+                sessionLoggedToday
+                  ? "border border-emerald-800 bg-emerald-950 text-emerald-300 active:bg-emerald-900"
+                  : "bg-emerald-600 text-white active:bg-emerald-500"
+              }`}
             >
-              Start session
+              {sessionLoggedToday
+                ? "Session logged ✓ — view or add sets"
+                : "Start session"}
             </Link>
           )}
         </section>

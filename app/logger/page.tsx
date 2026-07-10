@@ -43,8 +43,44 @@ export default function Logger() {
   const [customName, setCustomName] = useState("");
   const [restLeft, setRestLeft] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showCardio, setShowCardio] = useState(false);
+  const [cardioKm, setCardioKm] = useState("");
+  const [cardioMin, setCardioMin] = useState("");
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+
+  // iOS requires a user gesture to unlock audio — call this from tap handlers
+  function ensureAudio() {
+    try {
+      if (!audioCtxRef.current) audioCtxRef.current = new AudioContext();
+      if (audioCtxRef.current.state === "suspended") {
+        audioCtxRef.current.resume();
+      }
+    } catch {
+      // no audio available — vibration still fires
+    }
+  }
+
+  function beep() {
+    const ctx = audioCtxRef.current;
+    if (!ctx) return;
+    try {
+      [0, 0.25, 0.5].forEach((t) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 880;
+        gain.gain.setValueAtTime(0.25, ctx.currentTime + t);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.18);
+        osc.start(ctx.currentTime + t);
+        osc.stop(ctx.currentTime + t + 0.2);
+      });
+    } catch {
+      // ignore
+    }
+  }
 
   // --- init: seed, resume-or-create today's session, suggest exercises ---
   useEffect(() => {
@@ -52,13 +88,15 @@ export default function Logger() {
       try {
         await seedIfEmpty();
         const plan = scheduleService.getDayPlan();
-        const split = plan.split ?? "push";
-        const s = await logService.getOrCreateToday(split);
+        const s = await logService.getOrCreateToday(plan.split ?? "push");
         setSession({ ...s });
-        if (plan.split) {
-          const t = await workoutService.getTodayTargets(plan.split);
-          setSuggested(t.exercises.map((e) => e.name));
-        }
+        // Suggestions follow the SESSION's split (it may be swapped),
+        // never the calendar's default for today.
+        const effectiveSplit = ["push", "pull", "legs"].includes(s.split)
+          ? s.split
+          : (plan.split ?? "push");
+        const t = await workoutService.getTodayTargets(effectiveSplit);
+        setSuggested(t.exercises.map((e) => e.name));
       } catch (e) {
         setError(e instanceof Error ? e.message : String(e));
       }
@@ -97,6 +135,7 @@ export default function Logger() {
         if (prev <= 1) {
           if (timerRef.current) clearInterval(timerRef.current);
           if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
+          beep();
           return null;
         }
         return prev - 1;
@@ -119,6 +158,22 @@ export default function Logger() {
     setSuggested(t.exercises.map((e) => e.name));
   }
 
+  async function saveCardio() {
+    if (!session) return;
+    const km = parseFloat(cardioKm);
+    const min = parseFloat(cardioMin);
+    if (isNaN(min) || min <= 0) return;
+    const updated = await logService.setCardio(session, {
+      type: "treadmill",
+      km: isNaN(km) ? 0 : km,
+      min,
+    });
+    setSession({ ...updated });
+    setShowCardio(false);
+    setCardioKm("");
+    setCardioMin("");
+  }
+
   // --- exercise selection ---
   async function openExercise(name: string) {
     const ghost = await workoutRepo.getLastSetForExercise(name);
@@ -136,6 +191,7 @@ export default function Logger() {
   // --- log a set: writes to IndexedDB immediately ---
   async function logSet() {
     if (!session || !active) return;
+    ensureAudio(); // user gesture — unlocks the rest-timer beep on iOS
     const w = parseFloat(weight);
     const r = parseInt(reps, 10);
     if (isNaN(w) || isNaN(r) || r < 0) {
@@ -190,19 +246,26 @@ export default function Logger() {
 
       {/* Rest timer banner */}
       {restLeft !== null && (
-        <button
-          onClick={() => {
-            if (timerRef.current) clearInterval(timerRef.current);
-            setRestLeft(null);
-          }}
-          className="mt-4 flex items-center justify-between rounded-xl border border-sky-700 bg-sky-950 px-4 py-3"
-        >
-          <span className="text-sm font-semibold text-sky-300">REST</span>
+        <div className="mt-4 flex items-center justify-between gap-2 rounded-xl border border-sky-700 bg-sky-950 px-3 py-2.5">
+          <button
+            onClick={() => setRestLeft((p) => (p === null ? null : p + 30))}
+            className="rounded-lg border border-sky-700 px-3 py-2 text-sm font-semibold text-sky-300"
+          >
+            +30s
+          </button>
           <span className="font-mono text-2xl font-bold text-sky-200">
             {Math.floor(restLeft / 60)}:{String(restLeft % 60).padStart(2, "0")}
           </span>
-          <span className="text-xs text-sky-400">tap to skip</span>
-        </button>
+          <button
+            onClick={() => {
+              if (timerRef.current) clearInterval(timerRef.current);
+              setRestLeft(null);
+            }}
+            className="rounded-lg border border-sky-700 px-3 py-2 text-sm font-semibold text-sky-300"
+          >
+            skip
+          </button>
+        </div>
       )}
 
       {/* Split override chips */}
@@ -224,11 +287,65 @@ export default function Logger() {
         </div>
       )}
 
+      {/* Warm-up cardio */}
+      {!active && session && (
+        <div className="mt-4">
+          {session.cardio && !Array.isArray(session.cardio) ? (
+            <button
+              onClick={() => {
+                setShowCardio(true);
+                if (session.cardio && !Array.isArray(session.cardio)) {
+                  setCardioKm(String(session.cardio.km));
+                  setCardioMin(String(session.cardio.min));
+                }
+              }}
+              className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-2.5 text-left text-sm text-neutral-400"
+            >
+              Warm-up: {session.cardio.type} {session.cardio.km} km ·{" "}
+              {session.cardio.min} min <span className="text-xs">(edit)</span>
+            </button>
+          ) : !showCardio ? (
+            <button
+              onClick={() => setShowCardio(true)}
+              className="w-full rounded-xl border border-dashed border-neutral-800 px-4 py-2.5 text-sm text-neutral-500"
+            >
+              + warm-up cardio (treadmill)
+            </button>
+          ) : null}
+          {showCardio && (
+            <div className="mt-2 flex items-center gap-2 rounded-xl border border-neutral-800 bg-neutral-900 p-3">
+              <input
+                inputMode="decimal"
+                value={cardioKm}
+                onChange={(e) => setCardioKm(e.target.value)}
+                placeholder="km"
+                className="w-full min-w-0 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-center"
+              />
+              <input
+                inputMode="decimal"
+                value={cardioMin}
+                onChange={(e) => setCardioMin(e.target.value)}
+                placeholder="min"
+                className="w-full min-w-0 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-center"
+              />
+              <button
+                onClick={saveCardio}
+                className="shrink-0 rounded-lg bg-emerald-600 px-4 py-2 font-bold text-white"
+              >
+                Save
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Exercise list */}
       {!active && session && (
         <div className="mt-5 space-y-2">
           {Array.from(
-            new Set([...suggested, ...session.ex.map((e) => e.n)])
+            // performed order first (as you actually trained), then
+            // the not-yet-logged suggestions for this split
+            new Set([...session.ex.map((e) => e.n), ...suggested])
           ).map(
             (name) => {
               const logged = session.ex.find((e) => e.n === name);
