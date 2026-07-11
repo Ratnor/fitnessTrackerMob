@@ -59,6 +59,14 @@ export interface BodyReading {
 
 export interface HealthSnapshot {
   d: string; // YYYY-MM-DD
+  /** Raw (unrounded) body values from the Shortcut export — used as a
+   *  fingerprint to detect stale re-imports of the same Health sample. */
+  raw_body?: {
+    weight_lb?: number;
+    body_fat_pct?: number;
+    muscle_mass_lb?: number;
+    waist_cm?: number;
+  };
   hrv_ms: number | null;
   hrv_7day_avg: number | null;
   resting_hr_bpm: number | null;

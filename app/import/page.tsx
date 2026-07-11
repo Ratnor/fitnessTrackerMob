@@ -82,8 +82,33 @@ export default function Import() {
     const r = parsed.recovery ?? {};
     const a = parsed.activity_yesterday ?? {};
 
+    // Stale-sample detection: the Shortcut exports the LATEST Health sample
+    // (up to 30 days old). If a raw value is byte-identical to a previous
+    // day's export, it's the same old sample — skip it, don't re-log it.
+    const b = parsed.body;
+    const waistCm = waistCmFrom(b);
+    const rawBody = {
+      weight_lb: b?.weight_lb,
+      body_fat_pct: b?.body_fat_pct,
+      muscle_mass_lb: b?.muscle_mass_lb,
+      waist_cm: waistCm,
+    };
+    const priorSnapshots = (await healthRepo.getAll()).filter(
+      (s) => s.d < parsed.date!
+    );
+    const prevRaw =
+      priorSnapshots.length > 0
+        ? priorSnapshots[priorSnapshots.length - 1].raw_body
+        : undefined;
+    const isStale = (k: keyof typeof rawBody) =>
+      prevRaw?.[k] != null && rawBody[k] != null && prevRaw[k] === rawBody[k];
+    const staleFields = (
+      ["weight_lb", "body_fat_pct", "muscle_mass_lb", "waist_cm"] as const
+    ).filter(isStale);
+
     const snapshot: HealthSnapshot = {
       d: parsed.date,
+      raw_body: rawBody,
       hrv_ms: r.hrv_ms ?? null,
       hrv_7day_avg: r.hrv_7day_avg ?? null,
       resting_hr_bpm: r.resting_hr_bpm ?? null,
@@ -100,21 +125,31 @@ export default function Import() {
     await healthRepo.save(snapshot);
 
     let bodyMsg = "";
-    const b = parsed.body;
-    const waistCm = waistCmFrom(b);
-    if (b && (b.weight_lb != null || waistCm != null)) {
+    const fresh = {
+      w: !isStale("weight_lb") && b?.weight_lb != null,
+      bf: !isStale("body_fat_pct") && b?.body_fat_pct != null,
+      mm: !isStale("muscle_mass_lb") && b?.muscle_mass_lb != null,
+      waist: !isStale("waist_cm") && waistCm != null,
+    };
+    if (fresh.w || fresh.bf || fresh.mm || fresh.waist) {
       await bodyService.upsertReading({
         d: parsed.date,
-        ...(b.weight_lb != null ? { w: round1(b.weight_lb) } : {}),
-        ...(b.body_fat_pct != null ? { bf: round1(b.body_fat_pct) } : {}),
-        ...(b.muscle_mass_lb != null ? { mm: round1(b.muscle_mass_lb) } : {}),
-        ...(waistCm != null ? { waist: round1(waistCm) } : {}),
+        ...(fresh.w ? { w: round1(b!.weight_lb!) } : {}),
+        ...(fresh.bf ? { bf: round1(b!.body_fat_pct!) } : {}),
+        ...(fresh.mm ? { mm: round1(b!.muscle_mass_lb!) } : {}),
+        ...(fresh.waist ? { waist: round1(waistCm!) } : {}),
         note: "imported via Apple Health Shortcut",
       });
       bodyMsg = " + body reading";
     }
 
-    setSavedMsg(`Saved health snapshot${bodyMsg} for ${parsed.date} ✓`);
+    const staleMsg =
+      staleFields.length > 0
+        ? ` (skipped stale: ${staleFields.join(", ")} — unchanged since last export)`
+        : "";
+    setSavedMsg(
+      `Saved health snapshot${bodyMsg} for ${parsed.date} ✓${staleMsg}`
+    );
     setParsed(null);
     setRaw("");
   }
