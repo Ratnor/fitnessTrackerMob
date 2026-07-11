@@ -54,6 +54,43 @@ function flattenPantry(raw: Record<string, unknown>): PantryItem[] {
 }
 
 /**
+ * One-time targeted repairs for known bad records (unit bugs, export lag).
+ * Every repair is guarded by an exact-match condition, so each applies at
+ * most once and is a no-op on healthy data.
+ */
+async function applyOneTimeRepairs(
+  db: Awaited<ReturnType<typeof openDatabase>>
+): Promise<void> {
+  // 2026-07-08: waist was imported as 33.5 (inches stored as cm).
+  // The real tape reading that morning was 85.2 cm.
+  const r8 = await db.get("body", "2026-07-08");
+  if (r8 && r8.waist != null && Math.abs(r8.waist - 33.5) < 0.15) {
+    r8.waist = 85.2;
+    r8.note = "repaired: waist was imported in inches; corrected to 85.2 cm";
+    await db.put("body", r8);
+  }
+
+  // 2026-07-11: export-lag artifact. The 161.8 lb weigh-in happened on
+  // 2026-07-09, and the 85.2 waist belongs to 2026-07-08 (already there).
+  const r11 = await db.get("body", "2026-07-11");
+  if (r11 && Math.abs(r11.w - 161.8) < 0.05) {
+    const r9 = await db.get("body", "2026-07-09");
+    if (!r9) {
+      await db.put("body", {
+        d: "2026-07-09",
+        w: 161.8,
+        bf: r11.bf ?? null,
+        mm: r11.mm ?? null,
+        waist: null,
+        hip: null,
+        note: "repaired: weigh-in taken 07-09, was logged under 07-11 export date",
+      });
+    }
+    await db.delete("body", "2026-07-11");
+  }
+}
+
+/**
  * Idempotent seed: only writes historical data if the workouts store is empty.
  * Safe to call on every app load.
  */
@@ -85,6 +122,8 @@ export async function seedIfEmpty(): Promise<SeedResult> {
     await tx.done;
     seeded = true;
   }
+
+  await applyOneTimeRepairs(db);
 
   const counts = {
     workouts: await db.count("workouts"),
