@@ -5,6 +5,7 @@ export interface IBodyRepository {
   save(reading: BodyReading): Promise<void>;
   getAll(): Promise<BodyReading[]>;
   getLatest(): Promise<BodyReading | null>;
+  delete(d: string): Promise<void>;
   count(): Promise<number>;
 }
 
@@ -24,6 +25,11 @@ export class BodyRepository implements IBodyRepository {
   async getLatest(): Promise<BodyReading | null> {
     const all = await this.getAll();
     return all.length > 0 ? all[all.length - 1] : null;
+  }
+
+  async delete(d: string): Promise<void> {
+    const db = await openDatabase();
+    await db.delete("body", d);
   }
 
   async count(): Promise<number> {

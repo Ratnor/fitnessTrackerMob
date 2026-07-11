@@ -64,6 +64,8 @@ export default function Body() {
   const [weightTrend, setWeightTrend] = useState<TrendPoint[]>([]);
   const [waistTrend, setWaistTrend] = useState<TrendPoint[]>([]);
   const [recomp, setRecomp] = useState<RecompSignal | null>(null);
+  const [recent, setRecent] = useState<BodyReading[]>([]);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
   // form
@@ -77,7 +79,19 @@ export default function Body() {
     setWeightTrend(await bodyService.getWeightTrend(30));
     setWaistTrend(await bodyService.getWaistTrend());
     setRecomp(await bodyService.getRecompSignal());
+    const all = await bodyRepo.getAll();
+    setRecent(all.slice(-10).reverse());
   }, []);
+
+  async function deleteReading(d: string) {
+    if (confirmDelete !== d) {
+      setConfirmDelete(d);
+      return;
+    }
+    setConfirmDelete(null);
+    await bodyRepo.delete(d);
+    await refresh();
+  }
 
   useEffect(() => {
     (async () => {
@@ -199,6 +213,39 @@ export default function Body() {
         </h2>
         <Sparkline points={waistTrend} stroke="#34d399" />
       </section>
+
+      {/* Recent readings — tap delete twice to remove a bad entry */}
+      {recent.length > 0 && (
+        <section className="mt-4 rounded-xl border border-neutral-800 bg-neutral-900 p-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">
+            Recent readings
+          </h2>
+          <div className="mt-2 space-y-1.5">
+            {recent.map((r) => (
+              <div
+                key={r.d}
+                className="flex items-center justify-between gap-2 text-sm"
+              >
+                <span className="text-neutral-400">{r.d}</span>
+                <span className="min-w-0 flex-1 truncate text-right">
+                  {r.w > 0 ? `${r.w.toFixed(1)} lb` : "—"}
+                  {r.waist != null && ` · ${r.waist.toFixed(1)} cm`}
+                </span>
+                <button
+                  onClick={() => deleteReading(r.d)}
+                  className={`shrink-0 rounded-lg border px-2.5 py-1 text-xs ${
+                    confirmDelete === r.d
+                      ? "border-red-700 bg-red-950 text-red-300"
+                      : "border-neutral-700 text-neutral-500"
+                  }`}
+                >
+                  {confirmDelete === r.d ? "confirm?" : "delete"}
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {latest && (
         <p className="mt-4 text-center text-xs text-neutral-500">

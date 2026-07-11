@@ -26,16 +26,21 @@ export class BodyService {
     return all.slice(-days).map((r) => ({ d: r.d, v: r.w }));
   }
 
+  /** Valid human waist in cm — filters out unit mistakes (e.g. inches stored as cm). */
+  private static validWaist(r: BodyReading): boolean {
+    return r.waist != null && r.waist >= 50 && r.waist <= 200;
+  }
+
   async getWaistTrend(): Promise<TrendPoint[]> {
     const all = await this.body.getAll();
     return all
-      .filter((r) => r.waist != null)
+      .filter(BodyService.validWaist)
       .map((r) => ({ d: r.d, v: r.waist as number }));
   }
 
   async getRecompSignal(): Promise<RecompSignal> {
     const all = await this.body.getAll();
-    const withWaist = all.filter((r) => r.waist != null);
+    const withWaist = all.filter(BodyService.validWaist);
     if (all.length < 4 || withWaist.length < 2) {
       return {
         signal: "insufficient_data",
